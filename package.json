@@ -1,7 +1,7 @@
 {
 	"name": "react-crash-course-backend",
 	"version": "1.0.0",
-	"description": "",
+	"description": "### To run the server, follow the steps below:",
 	"main": "index.js",
 	"scripts": {
 		"start": "node app.js"
@@ -10,7 +10,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"body-parser": "^1.20.1",
+		"body-parser": "^1.20.3",
 		"cors": "^2.8.5",
 		"express": "^4.21.2"
 	}
