@@ -1,15 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors'); 
-const { getStoredPosts, storePosts, updatePost, deletePost } = require('./posts');
+const cors = require('cors'); // Import CORS
+const { getStoredPosts, storePosts, updatePost, deletePost } = require('./data/posts');
 
 const app = express();
 
 // Enable CORS for all requests
 app.use(cors());
+
 app.use(bodyParser.json());
 
-// Get all posts
 app.get('/posts', async (req, res) => {
   try {
     const storedPosts = await getStoredPosts();
@@ -19,7 +19,6 @@ app.get('/posts', async (req, res) => {
   }
 });
 
-// Get a single post by ID
 app.get('/posts/:id', async (req, res) => {
   try {
     const storedPosts = await getStoredPosts();
@@ -33,7 +32,6 @@ app.get('/posts/:id', async (req, res) => {
   }
 });
 
-// Create a new post
 app.post('/posts', async (req, res) => {
   try {
     const existingPosts = await getStoredPosts();
@@ -47,7 +45,6 @@ app.post('/posts', async (req, res) => {
   }
 });
 
-// Update a post
 app.put('/posts/:id', async (req, res) => {
   try {
     await updatePost(req.params.id, req.body);
@@ -57,7 +54,6 @@ app.put('/posts/:id', async (req, res) => {
   }
 });
 
-// Delete a post
 app.delete('/posts/:id', async (req, res) => {
   try {
     await deletePost(req.params.id);
@@ -67,7 +63,7 @@ app.delete('/posts/:id', async (req, res) => {
   }
 });
 
-// Use Vercel's provided PORT or default to 8080 locally
+// Use Vercel's provided PORT
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
