@@ -1,35 +1,22 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors'); // Import CORS
+const cors = require('cors'); // Import cors
 const { getStoredPosts, storePosts, updatePost, deletePost } = require('./data/posts');
 
 const app = express();
 
-// Enable CORS for all requests
-app.use(cors());
-
 app.use(bodyParser.json());
+app.use(cors()); // Enable CORS for all routes
 
 app.get('/posts', async (req, res) => {
-  try {
-    const storedPosts = await getStoredPosts();
-    res.json({ posts: storedPosts });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve posts' });
-  }
+  const storedPosts = await getStoredPosts();
+  res.json({ posts: storedPosts });
 });
 
 app.get('/posts/:id', async (req, res) => {
-  try {
-    const storedPosts = await getStoredPosts();
-    const post = storedPosts.find((post) => post.id === req.params.id);
-    if (!post) {
-      return res.status(404).json({ error: 'Post not found' });
-    }
-    res.json({ post });
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching post' });
-  }
+  const storedPosts = await getStoredPosts();
+  const post = storedPosts.find((post) => post.id === req.params.id);
+  res.json({ post });
 });
 
 app.post('/posts', async (req, res) => {
@@ -38,16 +25,20 @@ app.post('/posts', async (req, res) => {
     const postData = req.body;
     const newPost = { ...postData, id: Math.random().toString() };
     const updatedPosts = [newPost, ...existingPosts];
+
     await storePosts(updatedPosts);
     res.status(201).json({ message: 'Stored new post.', post: newPost });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to store post' });
+    console.error('Error storing post:', error);
+    res.status(500).json({ message: 'Failed to store post.' });
   }
 });
 
 app.put('/posts/:id', async (req, res) => {
+  const { id } = req.params;
+  const updatedData = req.body;
   try {
-    await updatePost(req.params.id, req.body);
+    await updatePost(id, updatedData);
     res.status(200).json({ message: 'Post updated successfully' });
   } catch (error) {
     res.status(404).json({ message: 'Post not found' });
@@ -55,15 +46,15 @@ app.put('/posts/:id', async (req, res) => {
 });
 
 app.delete('/posts/:id', async (req, res) => {
+  const { id } = req.params;
   try {
-    await deletePost(req.params.id);
+    await deletePost(id);
     res.status(200).json({ message: 'Post deleted' });
   } catch (error) {
     res.status(404).json({ message: 'Post not found' });
   }
 });
 
-// Use Vercel's provided PORT
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
