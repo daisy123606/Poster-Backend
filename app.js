@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 const { getStoredPosts, storePosts, updatePost, deletePost } = require('./data/posts');
 
 const app = express();
-
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
@@ -27,10 +26,7 @@ app.get('/posts/:id', async (req, res) => {
 app.post('/posts', async (req, res) => {
   const existingPosts = await getStoredPosts();
   const postData = req.body;
-  const newPost = {
-    ...postData,
-    id: Math.random().toString(),
-  };
+  const newPost = { ...postData, id: Math.random().toString() };
   const updatedPosts = [newPost, ...existingPosts];
   await storePosts(updatedPosts);
   res.status(201).json({ message: 'Stored new post.', post: newPost });
@@ -57,4 +53,11 @@ app.delete('/posts/:id', async (req, res) => {
   }
 });
 
-app.listen(8080);
+// Use Vercel's provided PORT
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+
+// Export for Vercel
+module.exports = app;
