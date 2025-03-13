@@ -1,16 +1,23 @@
 const fs = require('node:fs/promises');
+const FILE_PATH = 'post.json'; // Make sure this matches your file name
 
 async function getStoredPosts() {
-  const rawFileContent = await fs.readFile('posts.json', {
-    encoding: 'utf-8',
-  });
-  const data = JSON.parse(rawFileContent);
-  const storedPosts = data.posts ?? [];
-  return storedPosts;
+  try {
+    const rawFileContent = await fs.readFile(FILE_PATH, { encoding: 'utf-8' });
+    const data = JSON.parse(rawFileContent);
+    return data.posts || []; // Ensure it returns an array
+  } catch (error) {
+    console.error('Error reading post.json:', error);
+    return []; // Return empty array if file not found
+  }
 }
 
-function storePosts(posts) {
-  return fs.writeFile('posts.json', JSON.stringify({ posts: posts || [] }));
+async function storePosts(posts) {
+  try {
+    await fs.writeFile(FILE_PATH, JSON.stringify({ posts: posts || [] }, null, 2));
+  } catch (error) {
+    console.error('Error writing to post.json:', error);
+  }
 }
 
 async function updatePost(id, updatedData) {
@@ -29,7 +36,4 @@ async function deletePost(id) {
   await storePosts(filteredPosts);
 }
 
-exports.getStoredPosts = getStoredPosts;
-exports.storePosts = storePosts;
-exports.updatePost = updatePost;
-exports.deletePost = deletePost;
+module.exports = { getStoredPosts, storePosts, updatePost, deletePost };
